@@ -1,0 +1,113 @@
+<!-- templates/autores.html -->
+{% extends 'home.html' %}
+
+{% block content %}
+<!-- Sección de Autores -->
+<section id="autores" class="mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-user"></i> Autores</h2>
+
+        <!-- Botón para abrir el modal de nuevo autor -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nuevoAutorModal">
+            <i class="fas fa-plus"></i> Nuevo Autor
+        </button>
+    </div>
+  <!-- Modal para agregar nuevo autor -->
+  <div class="modal fade" id="nuevoAutorModal" tabindex="-1" role="dialog" aria-labelledby="nuevoAutorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoAutorModalLabel"><i class="fas fa-user"></i> Nuevo Autor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para registrar nuevo autor -->
+                <form method="post" action="{% url 'guardar_autor' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="nombre"><i class="fas fa-user"></i> Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="apellido"><i class="fas fa-user"></i> Apellido</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Apellido" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="biografia"><i class="fas fa-book"></i> Biografía</label>
+                            <textarea class="form-control" id="biografia" name="biografia" placeholder="Biografía" required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Autor</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <!-- Tabla para mostrar la lista de autores con opción para eliminar -->
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Biografía</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for autor in autores %}
+                <tr>
+                    <td>{{ autor.id }}</td>
+                    <td>{{ autor.nombre }}</td>
+                    <td>{{ autor.apellido }}</td>
+                    <td>{{ autor.biografia }}</td>
+                    <td>
+                        <a href="#" data-toggle="modal" data-target="#editarAutorModal{{ autor.id }}"><i class="fas fa-edit"></i></a> |
+                        <a href="{% url 'eliminar_autor' autor.id %}"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+<!-- Modal para Editar Autor -->
+{% for autor in autores %}
+    <div class="modal fade" id="editarAutorModal{{ autor.id }}" tabindex="-1" role="dialog" aria-labelledby="editarAutorModal{{ autor.id }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarAutorModal{{ autor.id }}Label"><i class="fas fa-edit"></i> Editar Autor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para editar autor -->
+                    <form method="post" action="{% url 'editar_autor' autor.id %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nombre"><i class="fas fa-user"></i> Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ autor.nombre }}" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="apellido"><i class="fas fa-user"></i> Apellido</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ autor.apellido }}" required>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="biografia"><i class="fas fa-book"></i> Biografía</label>
+                                <textarea class="form-control" id="biografia" name="biografia" required>{{ autor.biografia }}</textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

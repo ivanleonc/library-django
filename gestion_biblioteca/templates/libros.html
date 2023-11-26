@@ -1,0 +1,132 @@
+<!-- templates/libros.html -->
+{% extends 'home.html' %}
+
+{% block content %}
+<!-- Sección de Libros -->
+<section id="libros" class="mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-book"></i> Libros</h2>
+
+        <!-- Botón para abrir el modal de nuevo libro -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nuevoLibroModal">
+            <i class="fas fa-plus"></i> Nuevo Libro
+        </button>
+    </div>
+
+    <!-- Modal para agregar nuevo libro -->
+    <div class="modal fade" id="nuevoLibroModal" tabindex="-1" role="dialog" aria-labelledby="nuevoLibroModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoLibroModalLabel"><i class="fas fa-book"></i> Nuevo Libro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para registrar nuevo libro -->
+                    <form method="post" action="{% url 'guardar_libro' %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="titulo"><i class="fas fa-heading"></i> Título</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Título" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="isbn"><i class="fas fa-barcode"></i> ISBN</label>
+                                <input type="text" class="form-control" id="isbn" name="isbn" placeholder="ISBN" required>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="descripcion"><i class="fas fa-file-alt"></i> Descripción</label>
+                                <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Descripción" required></textarea>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="autor"><i class="fas fa-user"></i> Autor</label>
+                                <select class="form-control" id="autor" name="autor" required>
+                                    {% for autor in autores %}
+                                        <option value="{{ autor.id }}">{{ autor.nombre }} {{ autor.apellido }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Libro</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla para mostrar la lista de libros con opción para eliminar -->
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>ISBN</th>
+                <th>Descripción</th>
+                <th>Autor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for libro in libros %}
+                <tr>
+                    <td>{{ libro.id }}</td>
+                    <td>{{ libro.titulo }}</td>
+                    <td>{{ libro.isbn }}</td>
+                    <td>{{ libro.descripcion }}</td>
+                    <td>{{ libro.autor.nombre }} {{ libro.autor.apellido }}</td>
+                    <td>
+                        <a href="#" data-toggle="modal" data-target="#editarLibroModal{{ libro.id }}"><i class="fas fa-edit"></i></a> |
+                        <a href="{% url 'eliminar_libro' libro.id %}"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+<!-- Modal para Editar Libro -->
+{% for libro in libros %}
+    <div class="modal fade" id="editarLibroModal{{ libro.id }}" tabindex="-1" role="dialog" aria-labelledby="editarLibroModal{{ libro.id }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarLibroModal{{ libro.id }}Label"><i class="fas fa-edit"></i> Editar Libro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para editar libro -->
+                    <form method="post" action="{% url 'editar_libro' libro.id %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="titulo"><i class="fas fa-heading"></i> Título</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" value="{{ libro.titulo }}" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="isbn"><i class="fas fa-barcode"></i> ISBN</label>
+                                <input type="text" class="form-control" id="isbn" name="isbn" value="{{ libro.isbn }}" required>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="descripcion"><i class="fas fa-file-alt"></i> Descripción</label>
+                                <textarea class="form-control" id="descripcion" name="descripcion" required>{{ libro.descripcion }}</textarea>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="autor"><i class="fas fa-user"></i> Autor</label>
+                                <select class="form-control" id="autor" name="autor" required>
+                                    {% for autor in autores %}
+                                        <option value="{{ autor.id }}" {% if autor.id == libro.autor.id %} selected {% endif %}>{{ autor.nombre }} {{ autor.apellido }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

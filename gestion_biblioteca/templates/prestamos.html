@@ -1,0 +1,132 @@
+<!-- templates/prestamos.html -->
+{% extends 'home.html' %}
+
+{% block content %}
+<!-- Sección de Préstamos -->
+<section id="prestamos" class="mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-handshake"></i> Préstamos</h2>
+
+        <!-- Botón para abrir el modal de nuevo préstamo -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nuevoPrestamoModal">
+            <i class="fas fa-plus"></i> Nuevo Préstamo
+        </button>
+    </div>
+
+    <!-- Modal para agregar nuevo préstamo -->
+    <div class="modal fade" id="nuevoPrestamoModal" tabindex="-1" role="dialog" aria-labelledby="nuevoPrestamoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoPrestamoModalLabel"><i class="fas fa-handshake"></i> Nuevo Préstamo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para registrar nuevo préstamo -->
+                    <form method="post" action="{% url 'guardar_prestamo' %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="libro"><i class="fas fa-book"></i> Libro</label>
+                                <select class="form-control" id="libro" name="libro">
+                                    {% for libro in libros %}
+                                        <option value="{{ libro.id }}">{{ libro.titulo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="usuario"><i class="fas fa-user"></i> Usuario</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuario" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="fecha_prestamo"><i class="fas fa-calendar"></i> Fecha de Préstamo</label>
+                                <input type="date" class="form-control" id="fecha_prestamo" name="fecha_prestamo" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="fecha_devolucion"><i class="fas fa-calendar"></i> Fecha de Devolución</label>
+                                <input type="date" class="form-control" id="fecha_devolucion" name="fecha_devolucion" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Préstamo</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla para mostrar la lista de préstamos con opción para eliminar -->
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Libro</th>
+                <th>Usuario</th>
+                <th>Fecha de Préstamo</th>
+                <th>Fecha de Devolución</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestamo in prestamos %}
+                <tr>
+                    <td>{{ prestamo.id }}</td>
+                    <td>{{ prestamo.libro.titulo }}</td>
+                    <td>{{ prestamo.usuario }}</td>
+                    <td>{{ prestamo.fecha_prestamo }}</td>
+                    <td>{{ prestamo.fecha_devolucion }}</td>
+                    <td>
+                        <a href="#" data-toggle="modal" data-target="#editarPrestamoModal{{ prestamo.id }}"><i class="fas fa-edit"></i></a> |
+                        <a href="{% url 'eliminar_prestamo' prestamo.id %}"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+<!-- Modal para Editar Préstamo -->
+{% for prestamo in prestamos %}
+    <div class="modal fade" id="editarPrestamoModal{{ prestamo.id }}" tabindex="-1" role="dialog" aria-labelledby="editarPrestamoModal{{ prestamo.id }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarPrestamoModal{{ prestamo.id }}Label"><i class="fas fa-edit"></i> Editar Préstamo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para editar préstamo -->
+                    <form method="post" action="{% url 'editar_prestamo' prestamo.id %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="libro"><i class="fas fa-book"></i> Libro</label>
+                                <select class="form-control" id="libro" name="libro" required>
+                                    {% for libro in libros %}
+                                        <option value="{{ libro.id }}" {% if libro.id == prestamo.libro.id %} selected {% endif %}>{{ libro.titulo }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="usuario"><i class="fas fa-user"></i> Usuario</label>
+                                <input type="text" class="form-control" id="usuario" name="usuario" value="{{ prestamo.usuario }}" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="fecha_prestamo"><i class="fas fa-calendar"></i> Fecha de Préstamo</label>
+                                <input type="date" class="form-control" id="fecha_prestamo" name="fecha_prestamo" value="{{ prestamo.fecha_prestamo }}" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="fecha_devolucion"><i class="fas fa-calendar"></i> Fecha de Devolución</label>
+                                <input type="date" class="form-control" id="fecha_devolucion" name="fecha_devolucion" value="{{ prestamo.fecha_devolucion }}" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
