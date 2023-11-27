@@ -1,6 +1,7 @@
 # gestion_biblioteca/models.py
 
 from django.db import models
+from django.contrib.auth.models import User
 
 class Autor(models.Model):
     nombre = models.CharField(max_length=100)
